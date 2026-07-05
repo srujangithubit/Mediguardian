@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-text: var(--text);
+  --color-foreground: var(--text);
+
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-outfit);
+}
+
+:root {
+  --background: hsl(220, 20%, 97%);
+  --card: hsl(0, 0%, 100%);
+  --accent: hsl(168, 78%, 42%);
+  --accent-secondary: hsl(256, 85%, 68%);
+  --text: hsl(224, 20%, 10%);
+}
+
+.dark {
+  --background: hsl(224, 20%, 6%);
+  --card: hsl(224, 15%, 10%);
+  --accent: hsl(168, 78%, 52%);
+  --accent-secondary: hsl(256, 85%, 68%);
+  --text: hsl(0, 0%, 95%);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-card/60 backdrop-blur-xl border border-white/10 shadow-[0_4px_24px_rgba(0,0,0,0.05)];
+  }
+  .dark .glass {
+    @apply shadow-[0_4px_24px_rgba(0,0,0,0.2)];
+  }
+}

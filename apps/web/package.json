@@ -1,0 +1,46 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@medigaurdian/types": "workspace:*",
+    "@medigaurdian/ui": "workspace:*",
+    "@medigaurdian/utils": "workspace:*",
+    "@serwist/next": "latest",
+    "@tanstack/react-query": "latest",
+    "cmdk": "^1.1.1",
+    "framer-motion": "latest",
+    "idb": "^8.0.3",
+    "lucide-react": "latest",
+    "next": "16.2.10",
+    "next-themes": "latest",
+    "qrcode.react": "^4.2.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.80.0",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.9.2",
+    "remark-gfm": "^4.0.1",
+    "serwist": "latest",
+    "socket.io-client": "^4.8.3",
+    "zod": "^4.4.3",
+    "zustand": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

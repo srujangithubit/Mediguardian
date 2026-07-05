@@ -1,0 +1,7 @@
+paddleocr
+paddlepaddle
+torch
+opencv-python
+spacy
+fuzzywuzzy
+scikit-image

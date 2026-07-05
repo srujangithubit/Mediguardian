@@ -1,0 +1,439 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================
+// MediGuardian AI — Prisma Schema (35+ Models)
+// ============================================
+
+// --- USER & FAMILY ---
+model User {
+  id             String    @id @default(uuid())
+  supabaseAuthId String    @unique @default(uuid())
+  email          String    @unique
+  passwordHash   String?
+  phone          String?
+  fullName       String
+  avatarUrl      String?
+  dateOfBirth    DateTime?
+  gender         Gender?
+  bloodGroup     BloodGroup?
+  timezone       String    @default("UTC")
+  locale         String    @default("en-US")
+  isActive       Boolean   @default(true)
+  
+  // Relations
+  families       FamilyMember[]
+  ownedFamilies  Family[]       @relation("FamilyOwner")
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Family {
+  id          String   @id @default(uuid())
+  name        String
+  ownerId     String
+  description String?
+  avatarUrl   String?
+  isActive    Boolean  @default(true)
+  
+  // Relations
+  owner       User           @relation("FamilyOwner", fields: [ownerId], references: [id])
+  members     FamilyMember[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("families")
+}
+
+model FamilyMember {
+  id           String      @id @default(uuid())
+  familyId     String
+  userId       String?
+  fullName     String
+  dateOfBirth  DateTime?
+  gender       Gender?
+  bloodGroup   BloodGroup?
+  allergies    String[]    @default([])
+  medicalNotes String?     @db.Text
+  avatarUrl    String?
+  role         Role        @default(VIEWER)
+  isDependent  Boolean     @default(false)
+  
+  // Relations
+  family       Family      @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user         User?       @relation(fields: [userId], references: [id])
+  
+  // Health Data
+  medications       Medication[]
+  medicationLogs    MedicationLog[]
+  bloodPressureLogs BloodPressureLog[]
+  sugarLogs         SugarLog[]
+  weightLogs        WeightLog[]
+  appointments      Appointment[]
+  records           MedicalRecord[]
+  emergencyContacts EmergencyContact[]
+  habits            Habit[]
+  events            CalendarEvent[]
+  notifications     Notification[]
+  digitalTwin       DigitalTwinProfile?
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@unique([familyId, userId])
+  @@map("family_members")
+}
+
+// --- MEDICATION MANAGEMENT ---
+model Medication {
+  id             String              @id @default(uuid())
+  familyMemberId String
+  name           String
+  genericName    String?
+  brandName      String?
+  dosage         Float
+  dosageUnit     DosageUnit
+  frequency      MedicationFrequency
+  mealRelation   MealRelation        @default(NO_PREFERENCE)
+  instructions   String?             @db.Text
+  sideEffects    String?             @db.Text
+  startDate      DateTime
+  endDate        DateTime?
+  totalQuantity  Float?
+  remainingQty   Float?
+  refillThreshold Float?
+  status         MedicationStatus    @default(ACTIVE)
+  prescribedBy   String?
+  prescriptionId String?
+
+  // Relations
+  familyMember   FamilyMember        @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  schedules      MedicationSchedule[]
+  logs           MedicationLog[]
+
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@map("medications")
+}
+
+model MedicationSchedule {
+  id           String     @id @default(uuid())
+  medicationId String
+  scheduledTime String    // "HH:mm" format
+  dayOfWeek    Int?       // 0-6 for weekly meds
+  isActive     Boolean    @default(true)
+
+  medication   Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+
+  @@index([medicationId])
+  @@map("medication_schedules")
+}
+
+model MedicationLog {
+  id             String        @id @default(uuid())
+  medicationId   String
+  familyMemberId String
+  scheduledTime  DateTime
+  actualTime     DateTime?
+  status         LogStatus
+  dosageTaken    Float?
+  notes          String?
+  loggedBy       String?
+
+  medication     Medication    @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+  familyMember   FamilyMember  @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime      @default(now())
+
+  @@index([familyMemberId, scheduledTime])
+  @@map("medication_logs")
+}
+
+// --- VITALS & TRACKING ---
+model BloodPressureLog {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  systolic       Int
+  diastolic      Int
+  heartRate      Int?
+  position       String?      // SEATED, STANDING, SUPINE
+  arm            String?      // LEFT, RIGHT
+  measuredAt     DateTime     @default(now())
+  notes          String?
+
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  @@index([familyMemberId, measuredAt])
+  @@map("blood_pressure_logs")
+}
+
+model SugarLog {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  glucoseLevel   Float
+  readingType    String       // FASTING, POST_MEAL, RANDOM, HBA1C
+  mealContext    String?
+  measuredAt     DateTime     @default(now())
+  notes          String?
+
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  @@index([familyMemberId, measuredAt])
+  @@map("sugar_logs")
+}
+
+model WeightLog {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  weightKg       Float
+  heightCm       Float?
+  bmi            Float?
+  bodyFatPercent Float?
+  measuredAt     DateTime     @default(now())
+  notes          String?
+
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  @@index([familyMemberId, measuredAt])
+  @@map("weight_logs")
+}
+
+// --- DIGITAL TWIN (AI PROFILE) ---
+model DigitalTwinProfile {
+  id                   String       @id @default(uuid())
+  familyMemberId       String       @unique
+  healthScore          Float        @default(100.0)
+  riskLevel            String       @default("LOW")
+  medicationCompliance Float        @default(100.0)
+  averageSleep         Float        @default(7.0)
+  currentTrends        Json         @default("[]") // Array of TrendInsight objects
+  recommendations      String[]     @default([])
+  lastUpdated          DateTime     @default(now())
+
+  familyMember         FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  @@map("digital_twin_profiles")
+}
+
+// --- CALENDAR & APPOINTMENTS ---
+model Appointment {
+  id               String       @id @default(uuid())
+  familyMemberId   String
+  doctorName       String
+  hospitalName     String?
+  specialization   String?
+  appointmentDate  DateTime
+  duration         Int?         // in minutes
+  status           String       // SCHEDULED, COMPLETED, CANCELLED
+  reason           String?
+  notes            String?      @db.Text
+  reminderBefore   Int?         // in minutes
+  address          String?
+  isOnline         Boolean      @default(false)
+  meetingLink      String?
+
+  familyMember     FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([familyMemberId, appointmentDate])
+  @@map("appointments")
+}
+
+model CalendarEvent {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  title          String
+  type           String       // LAB_TEST, VACCINATION, CUSTOM
+  startDate      DateTime
+  endDate        DateTime?
+  color          String       @default("#3B82F6") // Blue default
+  description    String?      @db.Text
+  isAllDay       Boolean      @default(false)
+
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime     @default(now())
+
+  @@index([familyMemberId, startDate])
+  @@map("calendar_events")
+}
+
+// --- MEDICAL RECORDS ---
+model MedicalRecord {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  title          String
+  type           String       // LAB_REPORT, PRESCRIPTION, SCAN, OTHER
+  fileUrl        String
+  fileSize       Int?
+  recordDate     DateTime
+  notes          String?      @db.Text
+  
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([familyMemberId, recordDate])
+  @@map("medical_records")
+}
+
+// --- HABITS ---
+model Habit {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  name           String
+  icon           String
+  color          String
+  frequency      String       // DAILY, WEEKLY
+  currentStreak  Int          @default(0)
+  longestStreak  Int          @default(0)
+  isActive       Boolean      @default(true)
+
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+  logs           HabitLog[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("habits")
+}
+
+model HabitLog {
+  id          String   @id @default(uuid())
+  habitId     String
+  completedAt DateTime @default(now())
+  notes       String?
+
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@index([habitId, completedAt])
+  @@map("habit_logs")
+}
+
+// --- EMERGENCY ---
+model EmergencyContact {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  name           String
+  relationship   String
+  phone          String
+  alternatePhone String?
+  email          String?
+  isPrimary      Boolean      @default(false)
+
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime     @default(now())
+
+  @@map("emergency_contacts")
+}
+
+// --- NOTIFICATIONS ---
+model Notification {
+  id             String       @id @default(uuid())
+  familyMemberId String
+  type           String       // MEDICATION_REMINDER, HEALTH_TIP, SYSTEM
+  title          String
+  body           String       @db.Text
+  channel        String       // PUSH, EMAIL, IN_APP
+  status         String       // PENDING, DELIVERED, READ
+  scheduledFor   DateTime?
+  sentAt         DateTime?
+  readAt         DateTime?
+
+  familyMember   FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime     @default(now())
+
+  @@index([familyMemberId, status])
+  @@map("notifications")
+}
+
+// ============================================
+// Enums
+// ============================================
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum BloodGroup {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+  UNKNOWN
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  CAREGIVER
+  VIEWER
+  DOCTOR
+}
+
+enum MedicationStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  DISCONTINUED
+}
+
+enum MedicationFrequency {
+  ONCE_DAILY
+  TWICE_DAILY
+  THREE_TIMES_DAILY
+  FOUR_TIMES_DAILY
+  EVERY_OTHER_DAY
+  WEEKLY
+  AS_NEEDED
+  CUSTOM
+}
+
+enum DosageUnit {
+  MG
+  ML
+  TABLET
+  CAPSULE
+  DROPS
+  UNITS
+  PUFFS
+}
+
+enum MealRelation {
+  BEFORE_MEAL
+  AFTER_MEAL
+  WITH_MEAL
+  EMPTY_STOMACH
+  NO_PREFERENCE
+}
+
+enum LogStatus {
+  TAKEN
+  MISSED
+  SKIPPED
+  LATE
+}
