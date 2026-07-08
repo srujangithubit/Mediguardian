@@ -24,4 +24,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSerwist(nextConfig);
+const finalConfig = withSerwist(nextConfig);
+finalConfig.turbopack = finalConfig.turbopack || {};
+export default finalConfig;
