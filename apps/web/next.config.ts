@@ -11,6 +11,7 @@ const withSerwist = withSerwistInit({
 const nextConfig: NextConfig = {
   /* config options here */
   transpilePackages: ["@medigaurdian/ui", "@medigaurdian/utils", "@medigaurdian/types"],
+  turbopack: {},
 };
 
 export default withSerwist(nextConfig);
