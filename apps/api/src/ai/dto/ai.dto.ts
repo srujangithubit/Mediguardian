@@ -82,3 +82,15 @@ export class ProcessJournalDto {
   @IsNotEmpty()
   text: string;
 }
+
+export class MedicineChatDto {
+  @ApiProperty({ description: 'The message from the user' })
+  @IsString()
+  @IsNotEmpty()
+  query: string;
+
+  @ApiPropertyOptional({ description: 'Previous conversation history' })
+  @IsArray()
+  @IsOptional()
+  history?: any[];
+}

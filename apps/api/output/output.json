@@ -1,0 +1,18 @@
+{
+    "image_path": "C:\\Users\\sruja.SUNNULINGEGOWDA\\.gemini\\antigravity-ide\\brain\\460d07b3-3426-4a31-a28a-d4a806b19ccf\\media__1783321295664.png",
+    "preprocessed_image": "C:\\Users\\sruja.SUNNULINGEGOWDA\\.gemini\\antigravity-ide\\brain\\460d07b3-3426-4a31-a28a-d4a806b19ccf\\enhanced_clahe_media__1783321295664.png",
+    "raw_text": "MKBS\nMD,MS:\nReg: No: 270988 |\nNear\nPuni\nMob No:\n411038\nLOREM IPSUA\"\nTiring: 09.00\nAM-02.00 PM\nClscd: Thurslay\nDate: 27-Apr-2020_\n04:37 PM\nID: 266\nDEMO PATIENT (M)\nAddress:\nPUNE\ndeg): 36\n120/80 mmHg\nSAMPLE PRESCRIPTION\nMedicine Name\nDosage\nDuration\n1) TAB\nDEMO MEDICINE\nMoming\nNight\n10 Days\n(Betore\nFoco)\n(Tot:20 Cap)\n2) CAP. DEMO MEDICINE\nDays\n(Before Food}\nTominc\nEve,\n(Afte\nFood;\n(Tot:40 Tab)\n1/2 Moming\n1/2 Night\nFooo\nAdvice Given:\nAVOID OILY AND SPICY FOOD\nFollow Up: 12-05-2020\nCHOICE TO PRINT CHART ON Rx\nCharts\nATi\n1_\n17\n3 2 %\n225222\nSiquatuxe\nMB.B.S  MD M.s:\nTemo\nMBBS,MD,MS:\nFood)\nAdvice\n93\n5\nLortmit\nTemp\nGiven:\nIka\n713\nIt ?\nIIIICIIIE\nDalct 77-Apjr-Zojik 04:J7 PM\nID' znh\nDFkO) PATIFNT (MJ\nMurir Mm\nNainn\nInsiye\nMunniirin\nLanl\nIM\nMET\n\"WM:MR\nA\nizl\nLa4e\nFahi\nMkal\nAnyice\nLiytix\n'IYFN=\n4*tt\nEnIlau\nLpe 13-83-JItzo\nLlaITy\n7- 02\nAkAD-AS\nming\nF~\nCused:\nThursday\nAddress: PUNE\n2) CAP_\n(After Food)\nAtter Foodh\nT7c:\n1 3 f\n|\n3 % %\n2252\nSquatunc\nTetp\nDavs\nMEBS,MDMS\nRcp: No: 270983\nPWiL\n411S*\ntPt\nTirc:J213; 09:00\n02:00 PM\n04.37 PA\nEDICINE\nName\nDDsade\nWurtion\nDEMO\n(Toti2o Tab)\n2} CAP\n3} TAB\n{Tot:40\n4  TAB\n{Tot:lo\nGlven\n1\nLant\nABB.S ,\nAj;\nDat\nSqil",
+    "cleaned_text": "MKBS\nMD,MS:\nReg: No: 270988 |\nNear\nPuni\nMob No:\n411038\nLOREM IPSUA\"\nTiring: 09.00\nAM-02.00 PM\nClscd: Thurslay\nDate: 27-Apr-2020_\n04:37 PM\nID: 266\nDEMO PATIENT (M)\nAddress:\nPUNE\ndeg): 36\n120/80 mmHg\nSAMPLE PRESCRIPTION\nMedicine Name\nDosage\nDuration\n1) TAB\nDEMO MEDICINE\nMoming\nNight\n10 Days\n(Betore\nFoco)\n(Tot:20 Cap)\n2) CAP. DEMO MEDICINE\nDays\n(Before Food}\nTominc\nEve,\n(Afte\nFood;\n(Tot:40 Tab)\n1/2 Moming\n1/2 Night\nFooo\nAdvice Given:\nAVOID OILY AND SPICY FOOD\nFollow Up: 12-05-2020\nCHOICE TO PRINT CHART ON Rx\nCharts\nATi\n1_\n17\n3 2 %\n225222\nSiquatuxe\nMB.B.S  MD M.s:\nTemo\nMBBS,MD,MS:\nFood)\nAdvice\n93\n5\nLortmit\nTemp\nGiven:\nIka\n713\nIt ?\nIIIICIIIE\nDalct 77-Apjr-Zojik 04:J7 PM\nID' znh\nDFkO) PATIFNT (MJ\nMurir Mm\nNainn\nInsiye\nMunniirin\nLanl\nIM\nMET\n\"WM:MR\nA\nizl\nLa4e\nFahi\nMkal\nAnyice\nLiytix\n'IYFN=\n4*tt\nEnIlau\nLpe 13-83-JItzo\nLlaITy\n7- 02\nAkAD-AS\nming\nF~\nCused:\nThursday\nAddress: PUNE\n2) CAP_\n(After Food)\nAtter Foodh\nT7c:\n1 3 f\n|\n3 % %\n2252\nSquatunc\nTetp\nDavs\nMEBS,MDMS\nRcp: No: 270983\nPWiL\n411S*\ntPt\nTirc:J213; 09:00\n02:00 PM\n04.37 PA\nEDICINE\nName\nDDsade\nWurtion\nDEMO\n(Toti2o Tab)\n2} CAP\n3} TAB\n{Tot:40\n4  TAB\n{Tot:lo\nGlven\n1\nLant\nABB.S ,\nAj;\nDat\nSqil",
+    "medications": [],
+    "dosages": [],
+    "frequencies": [
+        "1 3",
+        "1/2",
+        "3 2",
+        "Night"
+    ],
+    "routes": [
+        "IM"
+    ],
+    "confidence": 49.55035989916393
+}

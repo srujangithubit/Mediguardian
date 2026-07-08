@@ -56,3 +56,16 @@ coverage/
 
 # Sentry
 .sentryclirc
+
+# Python
+__pycache__/
+*.pyc
+apps/api/src/ai/python/vector_store/
+apps/api/src/ai/python/output/
+
+
+# Secrets
+client_secret_*.json
+
+# Test images
+*_test_img.jpg

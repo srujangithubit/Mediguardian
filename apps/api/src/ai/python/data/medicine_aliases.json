@@ -1,0 +1,13 @@
+{
+  "crocin": ["paracetamol", "acetaminophen", "dolo", "tylenol", "calpol"],
+  "dolo": ["paracetamol", "acetaminophen", "crocin", "tylenol", "calpol"],
+  "paracetamol": ["acetaminophen", "crocin", "dolo", "tylenol", "calpol"],
+  "ibuprofen": ["advil", "motrin", "brufen"],
+  "aspirin": ["ecosprin", "disprin", "acetylsalicylic acid"],
+  "amoxicillin": ["moxikind", "novamox", "amoxil"],
+  "azithromycin": ["azithral", "zithromax", "azi"],
+  "cetirizine": ["cetzine", "zvrtec", "alerid"],
+  "pantoprazole": ["pan", "pantocid", "pantodac"],
+  "omeprazole": ["omez", "prilosec"],
+  "metformin": ["glycomet", "glucophage"]
+}

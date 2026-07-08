@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useFetch } from "../../../hooks/useFetch";
 import { api } from "../../../lib/api";
-import { Pill, Plus, Camera, Loader2, CheckCircle2, Clock, XCircle, AlertCircle } from "lucide-react";
+import { Pill, Plus, Camera, Loader2, CheckCircle2, Clock, XCircle, AlertCircle, Trash2 } from "lucide-react";
 import { useAuth } from "../../../lib/auth-context";
 import { AddMedicationModal } from "../../../components/medications/add-medication-modal";
 import { OcrScannerModal } from "../../../components/medications/ocr-scanner-modal";
-
+import { BulkAddMedicationModal } from "../../../components/medications/bulk-add-medication-modal";
 export default function MedicationsPage() {
   const { families } = useAuth();
   
@@ -35,6 +35,16 @@ export default function MedicationsPage() {
       refetch();
     } catch (err) {
       console.error("Failed to log adherence", err);
+    }
+  };
+
+  const handleDeleteMedication = async (medicationId: string) => {
+    if (!confirm('Are you sure you want to delete this medication?')) return;
+    try {
+      await api.delete(`/medications/${medicationId}`);
+      refetch();
+    } catch (err) {
+      console.error("Failed to delete medication", err);
     }
   };
 
@@ -87,8 +97,17 @@ export default function MedicationsPage() {
                   <h3 className="font-bold text-xl leading-tight">{med.name}</h3>
                   <p className="text-text/60 text-sm">{med.dosage} {med.dosageUnit}</p>
                 </div>
-                <div className={`px-2 py-1 rounded-lg text-xs font-medium ${med.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-white/10 text-text/60'}`}>
-                  {med.status}
+                <div className="flex items-center gap-2">
+                  <div className={`px-2 py-1 rounded-lg text-xs font-medium ${med.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-white/10 text-text/60'}`}>
+                    {med.status}
+                  </div>
+                  <button
+                    onClick={() => handleDeleteMedication(med.id)}
+                    className="p-1.5 hover:bg-red-500/10 hover:text-red-500 text-text/40 rounded-lg transition-colors"
+                    title="Delete Medication"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
 
@@ -157,19 +176,35 @@ export default function MedicationsPage() {
       )}
 
       {isAddModalOpen && familyMemberId && (
-        <AddMedicationModal 
-          familyMemberId={familyMemberId}
-          initialData={scannedData}
-          onClose={() => {
-            setIsAddModalOpen(false);
-            setScannedData(null);
-          }} 
-          onSuccess={() => {
-            setIsAddModalOpen(false);
-            setScannedData(null);
-            refetch();
-          }} 
-        />
+        Array.isArray(scannedData) ? (
+          <BulkAddMedicationModal
+            familyMemberId={familyMemberId}
+            initialData={scannedData}
+            onClose={() => {
+              setIsAddModalOpen(false);
+              setScannedData(null);
+            }} 
+            onSuccess={() => {
+              setIsAddModalOpen(false);
+              setScannedData(null);
+              refetch();
+            }}
+          />
+        ) : (
+          <AddMedicationModal 
+            familyMemberId={familyMemberId}
+            initialData={scannedData}
+            onClose={() => {
+              setIsAddModalOpen(false);
+              setScannedData(null);
+            }} 
+            onSuccess={() => {
+              setIsAddModalOpen(false);
+              setScannedData(null);
+              refetch();
+            }} 
+          />
+        )
       )}
     </div>
   );

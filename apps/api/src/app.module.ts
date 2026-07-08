@@ -21,6 +21,7 @@ import { EmergencyModule } from './emergency/emergency.module';
 import { FamiliesModule } from './families/families.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { RecordsModule } from './records/records.module';
+import { GoogleCalendarModule } from './integrations/google/google-calendar.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { RecordsModule } from './records/records.module';
     FamiliesModule,
     AppointmentsModule,
     RecordsModule,
+    GoogleCalendarModule,
   ],
   controllers: [AppController],
   providers: [

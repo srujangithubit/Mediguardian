@@ -12,6 +12,7 @@ import { CoachService } from './services/coach.service';
 import { RiskPredictionService } from './services/risk-prediction.service';
 import { WeeklyReportService } from './services/weekly-report.service';
 import { JournalService } from './services/journal.service';
+import { MedicineChatService } from './services/medicine-chat.service';
 
 @Module({
   imports: [TimelineModule],
@@ -28,6 +29,7 @@ import { JournalService } from './services/journal.service';
     RiskPredictionService,
     WeeklyReportService,
     JournalService,
+    MedicineChatService,
   ],
   exports: [
     ContextAssemblerService,
@@ -41,6 +43,7 @@ import { JournalService } from './services/journal.service';
     RiskPredictionService,
     WeeklyReportService,
     JournalService,
+    MedicineChatService,
   ],
 })
 export class AiModule {}

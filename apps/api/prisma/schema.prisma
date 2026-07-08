@@ -27,6 +27,7 @@ model User {
   timezone       String    @default("UTC")
   locale         String    @default("en-US")
   isActive       Boolean   @default(true)
+  googleRefreshToken String?
   
   // Relations
   families       FamilyMember[]
@@ -243,6 +244,7 @@ model Appointment {
   address          String?
   isOnline         Boolean      @default(false)
   meetingLink      String?
+  googleEventId    String?
 
   familyMember     FamilyMember @relation(fields: [familyMemberId], references: [id], onDelete: Cascade)
 

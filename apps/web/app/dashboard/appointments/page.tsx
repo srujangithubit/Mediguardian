@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Calendar as CalendarIcon, Plus, Video, MapPin, Clock, CalendarCheck2, XCircle, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../../../lib/auth-context";
 import { useFetch } from "../../../hooks/useFetch";
@@ -13,6 +14,19 @@ export default function AppointmentsPage() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [googlePopup, setGooglePopup] = useState<'success' | 'error' | null>(null);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const status = searchParams.get('google');
+    if (status === 'success' || status === 'error') {
+      setGooglePopup(status);
+      // Remove query param to prevent showing it again on refresh
+      router.replace('/dashboard/appointments', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const { data: res, refetch } = useFetch<any>(
     familyMemberId ? `/appointments?familyMemberId=${familyMemberId}&t=${refreshKey}` : null
@@ -20,8 +34,8 @@ export default function AppointmentsPage() {
 
   const appointments = Array.isArray(res) ? res : (res?.data || []);
 
-  const upcoming = appointments.filter(a => a.status === 'SCHEDULED' && new Date(a.appointmentDate) >= new Date());
-  const pastOrCancelled = appointments.filter(a => a.status !== 'SCHEDULED' || new Date(a.appointmentDate) < new Date());
+  const upcoming = appointments.filter(a => a.status === 'SCHEDULED');
+  const pastOrCancelled = appointments.filter(a => a.status !== 'SCHEDULED');
 
   const handleStatusUpdate = async (id: string, status: string) => {
     try {
@@ -42,14 +56,30 @@ export default function AppointmentsPage() {
           </h1>
           <p className="text-text/60 mt-1">Manage doctor visits, telehealth calls, and medical events.</p>
         </div>
-        <button 
-          onClick={() => setIsAddModalOpen(true)}
-          disabled={!familyMemberId}
-          className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-xl font-medium hover:bg-accent-secondary transition-colors shadow-lg shadow-accent/20 disabled:opacity-50"
-        >
-          <Plus size={18} />
-          Schedule Appointment
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={async () => {
+              try {
+                const res = await api.get<{ url: string }>('/google/auth-url');
+                window.location.href = res.url;
+              } catch (err) {
+                console.error("Failed to fetch Google auth url", err);
+              }
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-background/50 border border-white/10 text-text rounded-xl font-medium hover:bg-white/5 transition-colors"
+          >
+            <CalendarIcon size={18} />
+            Connect Google Calendar
+          </button>
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            disabled={!familyMemberId}
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-xl font-medium hover:bg-accent-secondary transition-colors shadow-lg shadow-accent/20 disabled:opacity-50"
+          >
+            <Plus size={18} />
+            Schedule Appointment
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -142,15 +172,51 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      {isAddModalOpen && familyMemberId && (
-        <AddAppointmentModal 
-          familyMemberId={familyMemberId} 
-          onClose={() => {
+      {isAddModalOpen && (
+        <AddAppointmentModal
+          familyMemberId={familyMemberId!}
+          onClose={() => setIsAddModalOpen(false)}
+          onAdded={() => {
             setIsAddModalOpen(false);
             setRefreshKey(prev => prev + 1);
             refetch();
-          }} 
+          }}
         />
+      )}
+
+      {googlePopup && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-[#1a1a24] border border-white/10 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button onClick={() => setGooglePopup(null)} className="absolute top-4 right-4 text-text/50 hover:text-white transition-colors">
+              <XCircle size={20} />
+            </button>
+            <div className="flex flex-col items-center text-center mt-4">
+              {googlePopup === 'success' ? (
+                <>
+                  <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4">
+                    <CheckCircle2 size={32} />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">Connected!</h2>
+                  <p className="text-text/70 mb-6">Your Google Calendar is now synced with Mediguardian.</p>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mb-4">
+                    <XCircle size={32} />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">Connection Failed</h2>
+                  <p className="text-text/70 mb-6">We couldn't connect to Google Calendar. Please try again.</p>
+                </>
+              )}
+              <button 
+                onClick={() => setGooglePopup(null)}
+                className="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

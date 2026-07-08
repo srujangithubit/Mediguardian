@@ -13,7 +13,8 @@ import {
   MessageSquare,
   FileText,
   X,
-  Pill
+  Pill,
+  Bot
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -25,6 +26,7 @@ const navItems = [
   { name: "Appointments", href: "/dashboard/appointments", icon: Calendar },
   { name: "Messages", href: "/dashboard/messages", icon: MessageSquare },
   { name: "Records", href: "/dashboard/records", icon: FileText },
+  { name: "AI Chat", href: "/dashboard/medicine-chat", icon: Bot },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

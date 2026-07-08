@@ -14,7 +14,7 @@ export function GroceryList() {
 
   const initialItems = (data?.groceryList || []).map((item: any, idx: number) => ({
     id: idx + 1,
-    name: typeof item === "string" ? item : item.name || item,
+    name: typeof item === "string" ? item : item.item || item.name || JSON.stringify(item),
     checked: false,
   }));
 

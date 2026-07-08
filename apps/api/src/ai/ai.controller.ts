@@ -10,7 +10,8 @@ import { CoachService } from './services/coach.service';
 import { RiskPredictionService } from './services/risk-prediction.service';
 import { WeeklyReportService } from './services/weekly-report.service';
 import { JournalService } from './services/journal.service';
-import { UpdateDigitalTwinDto, IdentifyMedicineDto, CheckInteractionDto, CopilotChatDto, ProcessJournalDto } from './dto/ai.dto';
+import { UpdateDigitalTwinDto, IdentifyMedicineDto, CheckInteractionDto, CopilotChatDto, ProcessJournalDto, MedicineChatDto } from './dto/ai.dto';
+import { MedicineChatService } from './services/medicine-chat.service';
 
 @ApiTags('AI Intelligence')
 @Controller('ai')
@@ -26,6 +27,7 @@ export class AiController {
     private readonly riskPrediction: RiskPredictionService,
     private readonly weeklyReport: WeeklyReportService,
     private readonly journalService: JournalService,
+    private readonly medicineChatService: MedicineChatService,
   ) {}
 
   @Post('digital-twin')
@@ -54,6 +56,13 @@ export class AiController {
   @ApiResponse({ status: 200, description: 'Copilot responded successfully' })
   async chat(@Body() dto: CopilotChatDto) {
     return this.copilotService.chat(dto.familyMemberId, dto.message, dto.history || []);
+  }
+
+  @Post('medicine-chat')
+  @ApiOperation({ summary: 'Chat with Offline Medicine AI (RAG)' })
+  @ApiResponse({ status: 200, description: 'Offline Medicine Chatbot responded successfully' })
+  async medicineChat(@Body() dto: MedicineChatDto) {
+    return this.medicineChatService.chat(dto.query, dto.history || []);
   }
 
   @Get('food-recommendations')

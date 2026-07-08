@@ -1,7 +1,9 @@
-paddleocr
-paddlepaddle
+pandas
+sentence-transformers
+faiss-cpu
 torch
-opencv-python
-spacy
-fuzzywuzzy
-scikit-image
+transformers
+fastapi
+uvicorn
+rapidfuzz
+rank-bm25

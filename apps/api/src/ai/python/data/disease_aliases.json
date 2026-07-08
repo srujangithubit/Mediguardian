@@ -1,0 +1,11 @@
+{
+  "fever": ["temperature", "pyrexia", "high temperature", "febrile"],
+  "headache": ["migraine", "head pain", "head ache"],
+  "stomach ache": ["abdominal pain", "tummy ache", "gastric pain", "stomach pain", "stomachache"],
+  "nausea": ["vomiting", "puking", "feeling sick", "throw up", "throwing up"],
+  "diarrhea": ["loose motions", "loose bowels", "runny stool"],
+  "hypertension": ["high blood pressure", "high bp", "bp"],
+  "diabetes": ["high blood sugar", "sugar problem", "sugar"],
+  "cold": ["runny nose", "sneezing", "coryza", "common cold"],
+  "cough": ["dry cough", "wet cough", "phlegm", "khasi"]
+}

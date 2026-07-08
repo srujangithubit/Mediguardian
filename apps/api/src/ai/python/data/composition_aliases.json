@@ -1,0 +1,10 @@
+{
+  "acetaminophen": ["paracetamol"],
+  "paracetamol": ["acetaminophen"],
+  "ascorbic acid": ["vitamin c"],
+  "cholecalciferol": ["vitamin d3", "vitamin d"],
+  "cyanocobalamin": ["vitamin b12"],
+  "retinol": ["vitamin a"],
+  "tocopherol": ["vitamin e"],
+  "acetylsalicylic acid": ["aspirin"]
+}

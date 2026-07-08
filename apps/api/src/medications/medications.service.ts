@@ -105,53 +105,109 @@ export class MedicationsService {
       
       const parsed = JSON.parse(outputData);
       
-      // Transform the Python output into the expected frontend schema
-      const name = parsed.medications && parsed.medications.length > 0 ? parsed.medications[0] : 'Unknown Medication';
-      
-      // Parse dosage like "500mg" into 500 and "MG"
-      let dosage = 0;
-      let dosageUnit = 'MG';
-      if (parsed.dosages && parsed.dosages.length > 0) {
-        const dosageStr = parsed.dosages[0];
-        const match = dosageStr.match(/([\d.]+)\s*([a-zA-Z]+)/);
-        if (match) {
-          dosage = parseFloat(match[1]);
-          dosageUnit = match[2].toUpperCase();
-        } else {
-          dosage = parseFloat(dosageStr) || 0;
-        }
-      }
+      // Transform the Python output into an array of medication objects
+      const extractedMedications = [];
+      const medicationNames = parsed.medications || [];
+      const dosages = parsed.dosages || [];
+      const frequencies = parsed.frequencies || [];
+      const routes = parsed.routes || [];
 
-      // Parse frequency like "bid" into standard format
-      let frequency = 'ONCE_DAILY';
-      let schedules = [{ scheduledTime: "08:00" }];
-      if (parsed.frequencies && parsed.frequencies.length > 0) {
-        const freqStr = parsed.frequencies[0].toLowerCase();
-        if (freqStr.includes('bid') || freqStr.includes('twice') || freqStr.includes('bd')) {
-          frequency = 'TWICE_DAILY';
-          schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "20:00" }];
-        } else if (freqStr.includes('tid') || freqStr.includes('three') || freqStr.includes('tds')) {
-          frequency = 'THRICE_DAILY';
-          schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "14:00" }, { scheduledTime: "20:00" }];
-        } else if (freqStr.includes('qid') || freqStr.includes('four') || freqStr.includes('qds')) {
-          frequency = 'FOUR_TIMES_DAILY';
-          schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "12:00" }, { scheduledTime: "16:00" }, { scheduledTime: "20:00" }];
-        } else if (freqStr.includes('prn') || freqStr.includes('as needed') || freqStr.includes('sos')) {
-          frequency = 'AS_NEEDED';
+      // If no medications found but we have some text, we could return empty or a generic one.
+      // We will loop over however many medications were found.
+      for (let i = 0; i < Math.max(medicationNames.length, 1); i++) {
+        const name = medicationNames[i] || 'Unknown Medication';
+        
+        let dosage = 0;
+        let dosageUnit = 'MG';
+        if (dosages[i]) {
+          const dosageStr = dosages[i];
+          const match = dosageStr.match(/([\d.]+)\s*([a-zA-Z]+)/);
+          if (match) {
+            dosage = parseFloat(match[1]);
+            dosageUnit = match[2].toUpperCase();
+            
+            // Map units to supported Prisma Enums (MG, ML, TABLET, CAPSULE, DROPS, UNITS, PUFFS)
+            if (dosageUnit === 'G' || dosageUnit === 'GM') {
+              dosage *= 1000;
+              dosageUnit = 'MG';
+            } else if (dosageUnit === 'MCG') {
+              dosage /= 1000;
+              dosageUnit = 'MG';
+            } else if (!['MG', 'ML', 'TABLET', 'CAPSULE', 'DROPS', 'UNITS', 'PUFFS'].includes(dosageUnit)) {
+              dosageUnit = 'MG'; // default fallback
+            }
+          } else {
+            dosage = parseFloat(dosageStr) || 0;
+          }
+        }
+
+        let frequency = 'ONCE_DAILY';
+        let schedules = [{ scheduledTime: "08:00" }];
+        if (frequencies[i]) {
+          const freqStr = frequencies[i].toLowerCase();
           schedules = [];
+          
+          // Check for specific time keywords
+          if (freqStr.includes('morning') || freqStr.includes('breakfast') || freqStr.includes('1-0-0')) {
+            schedules.push({ scheduledTime: "08:00" });
+          }
+          if (freqStr.includes('afternoon') || freqStr.includes('lunch') || freqStr.includes('0-1-0')) {
+            schedules.push({ scheduledTime: "14:00" });
+          }
+          if (freqStr.includes('evening') || freqStr.includes('night') || freqStr.includes('bedtime') || freqStr.includes('dinner') || freqStr.includes('0-0-1')) {
+            schedules.push({ scheduledTime: "20:00" });
+          }
+
+          // Check for Indian dosage patterns
+          if (freqStr.includes('1-1-1')) {
+            schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "14:00" }, { scheduledTime: "20:00" }];
+          } else if (freqStr.includes('1-0-1') || freqStr.includes('1/2-0-1')) {
+            schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "20:00" }];
+          }
+
+          // Map length to frequency enum
+          if (schedules.length === 1) frequency = 'ONCE_DAILY';
+          else if (schedules.length === 2) frequency = 'TWICE_DAILY';
+          else if (schedules.length === 3) frequency = 'THREE_TIMES_DAILY';
+          else if (schedules.length >= 4) frequency = 'FOUR_TIMES_DAILY';
+
+          // Fallbacks for standard medical abbreviations if no specific times were matched
+          if (schedules.length === 0) {
+            if (freqStr.includes('bid') || freqStr.includes('twice') || freqStr.includes('bd') || freqStr.match(/\b2\b/)) {
+              frequency = 'TWICE_DAILY';
+              schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "20:00" }];
+            } else if (freqStr.includes('tid') || freqStr.includes('three') || freqStr.includes('tds') || freqStr.match(/\b3\b/)) {
+              frequency = 'THREE_TIMES_DAILY';
+              schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "14:00" }, { scheduledTime: "20:00" }];
+            } else if (freqStr.includes('qid') || freqStr.includes('four') || freqStr.includes('qds') || freqStr.match(/\b4\b/)) {
+              frequency = 'FOUR_TIMES_DAILY';
+              schedules = [{ scheduledTime: "08:00" }, { scheduledTime: "12:00" }, { scheduledTime: "16:00" }, { scheduledTime: "20:00" }];
+            } else if (freqStr.includes('prn') || freqStr.includes('as needed') || freqStr.includes('sos')) {
+              frequency = 'AS_NEEDED';
+              schedules = [];
+            } else {
+              frequency = 'ONCE_DAILY';
+              schedules = [{ scheduledTime: "08:00" }];
+            }
+          }
+        }
+
+        const instructions = `Route: ${routes[i] || 'N/A'}`;
+
+        // Only add if it's a real medication, or if it's the only one (fallback)
+        if (name !== 'Unknown Medication' || medicationNames.length === 0) {
+          extractedMedications.push({
+            name,
+            dosage,
+            dosageUnit,
+            frequency,
+            instructions,
+            schedules
+          });
         }
       }
 
-      const instructions = `Route: ${(parsed.routes || []).join(', ') || 'N/A'}`;
-
-      return {
-        name,
-        dosage,
-        dosageUnit,
-        frequency,
-        instructions,
-        schedules
-      };
+      return extractedMedications;
 
     } catch (error) {
       console.error('Prescription OCR Error:', error);
